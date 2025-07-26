@@ -1,11 +1,11 @@
 {
-  "id": "beb411fa-82cf-476b-b568-318aa11e552e",
+  "id": "783a745a-1658-46ec-b31d-3ae904da2768",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.applicants": {
-      "name": "applicants",
+    "public.reservation_logs": {
+      "name": "reservation_logs",
       "schema": "",
       "columns": {
         "id": {
@@ -15,108 +15,17 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "full_name": {
-          "name": "full_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "phone": {
-          "name": "phone",
-          "type": "varchar(13)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "socials": {
-          "name": "socials",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "min_salary_expectation": {
-          "name": "min_salary_expectation",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "max_salary_expectation": {
-          "name": "max_salary_expectation",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "summary": {
-          "name": "summary",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "applicants_user_id_users_id_fk": {
-          "name": "applicants_user_id_users_id_fk",
-          "tableFrom": "applicants",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.job_application_logs": {
-      "name": "job_application_logs",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "job_application_id": {
-          "name": "job_application_id",
+        "reservation_id": {
+          "name": "reservation_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
         "status": {
           "name": "status",
-          "type": "job_application_status",
-          "typeSchema": "public",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "note": {
           "name": "note",
@@ -134,12 +43,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "job_application_logs_job_application_id_job_applications_id_fk": {
-          "name": "job_application_logs_job_application_id_job_applications_id_fk",
-          "tableFrom": "job_application_logs",
-          "tableTo": "job_applications",
+        "reservation_logs_reservation_id_reservations_id_fk": {
+          "name": "reservation_logs_reservation_id_reservations_id_fk",
+          "tableFrom": "reservation_logs",
+          "tableTo": "reservations",
           "columnsFrom": [
-            "job_application_id"
+            "reservation_id"
           ],
           "columnsTo": [
             "id"
@@ -154,8 +63,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.job_applications": {
-      "name": "job_applications",
+    "public.reservations": {
+      "name": "reservations",
       "schema": "",
       "columns": {
         "id": {
@@ -165,25 +74,54 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "applicant_id": {
-          "name": "applicant_id",
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "room_id": {
+          "name": "room_id",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_room": {
+          "name": "total_room",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discount": {
+          "name": "discount",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "job_id": {
-          "name": "job_id",
-          "type": "uuid",
+        "total_price": {
+          "name": "total_price",
+          "type": "numeric(12, 2)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "status": {
           "name": "status",
-          "type": "job_application_status",
-          "typeSchema": "public",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'in_progress'"
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -202,41 +140,49 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "job_applications_applicant_id_applicants_id_fk": {
-          "name": "job_applications_applicant_id_applicants_id_fk",
-          "tableFrom": "job_applications",
-          "tableTo": "applicants",
+        "reservations_room_id_rooms_id_fk": {
+          "name": "reservations_room_id_rooms_id_fk",
+          "tableFrom": "reservations",
+          "tableTo": "rooms",
           "columnsFrom": [
-            "applicant_id"
+            "room_id"
           ],
           "columnsTo": [
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "no action"
         },
-        "job_applications_job_id_jobs_id_fk": {
-          "name": "job_applications_job_id_jobs_id_fk",
-          "tableFrom": "job_applications",
-          "tableTo": "jobs",
+        "reservations_user_id_users_id_fk": {
+          "name": "reservations_user_id_users_id_fk",
+          "tableFrom": "reservations",
+          "tableTo": "users",
           "columnsFrom": [
-            "job_id"
+            "user_id"
           ],
           "columnsTo": [
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "reservations_code_unique": {
+          "name": "reservations_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.jobs": {
-      "name": "jobs",
+    "public.room_images": {
+      "name": "room_images",
       "schema": "",
       "columns": {
         "id": {
@@ -246,36 +192,180 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
+        "room_id": {
+          "name": "room_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "room_images_room_id_rooms_id_fk": {
+          "name": "room_images_room_id_rooms_id_fk",
+          "tableFrom": "room_images",
+          "tableTo": "rooms",
+          "columnsFrom": [
+            "room_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.room_reviews": {
+      "name": "room_reviews",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "room_id": {
+          "name": "room_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rating": {
+          "name": "rating",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "room_reviews_room_id_rooms_id_fk": {
+          "name": "room_reviews_room_id_rooms_id_fk",
+          "tableFrom": "room_reviews",
+          "tableTo": "rooms",
+          "columnsFrom": [
+            "room_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "room_reviews_user_id_users_id_fk": {
+          "name": "room_reviews_user_id_users_id_fk",
+          "tableFrom": "room_reviews",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.rooms": {
+      "name": "rooms",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discount": {
+          "name": "discount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
         },
         "description": {
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "min_salary_offered": {
-          "name": "min_salary_offered",
+        "total_room": {
+          "name": "total_room",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "max_salary_offered": {
-          "name": "max_salary_offered",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "is_open": {
-          "name": "is_open",
-          "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": true
+          "default": 1
         },
         "created_at": {
           "name": "created_at",
@@ -300,6 +390,86 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "rooms_code_unique": {
+          "name": "rooms_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.room_videos": {
+      "name": "room_videos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "room_id": {
+          "name": "room_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "video_url": {
+          "name": "video_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "room_videos_room_id_rooms_id_fk": {
+          "name": "room_videos_room_id_rooms_id_fk",
+          "tableFrom": "room_videos",
+          "tableTo": "rooms",
+          "columnsFrom": [
+            "room_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -335,7 +505,31 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'applicant'"
+          "default": "'customer'"
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -362,25 +556,12 @@
     }
   },
   "enums": {
-    "public.job_application_status": {
-      "name": "job_application_status",
-      "schema": "public",
-      "values": [
-        "in_progress",
-        "not_selected",
-        "interview",
-        "under_review",
-        "offer_made",
-        "rejected",
-        "hired"
-      ]
-    },
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
       "values": [
         "admin",
-        "applicant"
+        "customer"
       ]
     }
   },

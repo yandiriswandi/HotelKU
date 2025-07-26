@@ -7,6 +7,7 @@ import {
   integer,
   pgEnum,
   decimal,
+  numeric,
 } from 'drizzle-orm/pg-core'
 
 export const userRoleEnum = pgEnum('user_role', ['admin', 'customer'])
@@ -17,8 +18,8 @@ export const usersTable = pgTable('users', {
   password: text().notNull(),
   role: userRoleEnum('role').notNull().default('customer'),
   full_name: text('full_name').notNull(),
-  phone: varchar({ length: 13 }).notNull(),
-  address: text('address').notNull(), // Tambahkan alamat
+  phone: varchar('phone').notNull(),
+  address: text('address'), // Tambahkan alamat
   image_url: text('image_url'), // Tidak dibatasi panjang dan boleh NULL // Tambahkan URL gambar atau nama file
   created_at: timestamp({ withTimezone: true }).defaultNow(),
   updated_at: timestamp({ withTimezone: true }).defaultNow(),
@@ -29,7 +30,7 @@ export const roomTable = pgTable('rooms', {
   code: text('code').notNull().unique(),
   name: text('name').notNull(),
   price: decimal('price', { precision: 12, scale: 2 }).notNull(),
-  image_url: text('image_url'),
+  discount: numeric('discount'),
   description: text('description'),
   total_room: integer('total_room').notNull().default(1), // ⬅️ jumlah unit tersedia
   created_at: timestamp({ withTimezone: true }).defaultNow(),
@@ -42,7 +43,7 @@ export const roomVideosTable = pgTable('room_videos', {
   room_id: uuid('room_id')
     .notNull()
     .references(() => roomTable.id, { onDelete: 'cascade' }),
-  title: text('title').notNull(),
+  title: text('title'),
   description: text('description'),
   video_url: text('video_url').notNull(),
   created_at: timestamp({ withTimezone: true }).defaultNow(),
@@ -59,15 +60,18 @@ export const roomImageTable = pgTable('room_images', {
   updated_at: timestamp({ withTimezone: true }).defaultNow(),
 })
 
-export const reservationTable = pgTable('room_images', {
+export const reservationTable = pgTable('reservations', {
   id: uuid('id').defaultRandom().primaryKey(),
   code: text('code').notNull().unique(),
+  arrival: timestamp({ withTimezone: true }).defaultNow(),
+  departure: timestamp({ withTimezone: true }).defaultNow(),
   room_id: uuid('room_id')
     .notNull()
     .references(() => roomTable.id, { onDelete: 'cascade' }),
   user_id: uuid('user_id')
     .notNull()
     .references(() => usersTable.id, { onDelete: 'cascade' }),
+  note: text('note'),
   total_room: integer('total_room').notNull().default(1), // ⬅️ jumlah unit tersedia
   price: decimal('price', { precision: 12, scale: 2 }).notNull(),
   discount: integer('discount'),
@@ -79,13 +83,10 @@ export const reservationTable = pgTable('room_images', {
 
 export const reservationLogsTable = pgTable('reservation_logs', {
   id: uuid('id').defaultRandom().primaryKey(),
-  reservation_id: uuid('job_applreservation_idication_id').references(
-    () => reservationTable.id,
-    {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    },
-  ),
+  reservation_id: uuid('reservation_id').references(() => reservationTable.id, {
+    onDelete: 'cascade',
+    onUpdate: 'cascade',
+  }),
   status: integer('status'),
   note: text('note').notNull(),
   created_at: timestamp({ withTimezone: true }).defaultNow(),
@@ -96,17 +97,19 @@ export const roomReviewTable = pgTable('room_reviews', {
   room_id: uuid('room_id')
     .notNull()
     .references(() => roomTable.id, { onDelete: 'cascade' }),
+  reservation_id: uuid('reservation_id')
+    .notNull()
+    .references(() => reservationTable.id, { onDelete: 'cascade' }),
   user_id: uuid('user_id')
     .notNull()
     .references(() => usersTable.id, { onDelete: 'cascade' }),
-
-  rating: integer('rating') // misal skala 1-5
+  rating: numeric('rating') // misal skala 1-5
     .notNull(),
   comment: text('comment'), // bisa null jika hanya kasih rating saja
   created_at: timestamp({ withTimezone: true }).defaultNow(),
 })
 
-// INSERT INTO users (email, password, role) VALUES ('admin@mail.com', '$2a$12$WrVGbnSYAQr.RpVIISQExepfZnNVpkTkd8o7Fh.JuacCN9O2/Jjmy', 'admin');
+// INSERT INTO users (full_name,phone,email, password, role) VALUES ('admin','085951393322','admin@mail.com', '$2a$12$WrVGbnSYAQr.RpVIISQExepfZnNVpkTkd8o7Fh.JuacCN9O2/Jjmy', 'admin');
 
 // 📘 Catatan Status Reservasi
 // 1. pending

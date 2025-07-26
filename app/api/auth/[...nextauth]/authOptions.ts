@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
 import { db } from '@/lib/db'
-import { usersTable, applicantsTable } from '@/lib/db/schema'
+import { usersTable } from '@/lib/db/schema'
+import { UserType } from '@/types/common'
 import bcrypt from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 import jwt from 'jsonwebtoken'
-import { UserType } from '@/types/common'
-import { RequestInternal } from 'next-auth'
+import type { NextAuthOptions } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 const MAX_AGE = 60 * 60 * 24
 
@@ -36,14 +35,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error('User not registered')
         }
 
-        if (user.role === 'applicant') {
-          const [applicant] = await db
-            .select()
-            .from(applicantsTable)
-            .where(eq(applicantsTable.user_id, user.id))
-          user.applicant_id = applicant.id
-        }
-
         const isValidPassword = await bcrypt.compare(
           credentials?.password || '',
           user.password,
@@ -56,7 +47,8 @@ export const authOptions: NextAuthOptions = {
         const token = jwt.sign(
           {
             id: user.id,
-            applicant_id: user.applicant_id,
+            full_name: user.full_name,
+            image_url: user.image_url,
             email: user.email,
             role: user.role,
           },
@@ -72,8 +64,9 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id
-        token.applicant_id = user.applicant_id
         token.role = user.role
+        token.full_name = user.full_name
+        token.image_url = user.image_url
         token.email = user.email
         token.token = user.token
         token.expires = Math.floor(Date.now() / 1000) + MAX_AGE
@@ -92,8 +85,9 @@ export const authOptions: NextAuthOptions = {
 
       if (session.user) {
         session.user.id = token.id
-        session.user.applicant_id = token.applicant_id
         session.user.role = token.role
+        session.user.full_name = token.full_name
+        session.user.image_url = token.image_url
         session.user.token = token.token
       }
 

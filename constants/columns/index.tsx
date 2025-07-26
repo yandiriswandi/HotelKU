@@ -22,8 +22,14 @@ import {
   Paperclip,
 } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
-import { JobType, JobApplicationsType, ApplicationsType } from '@/types/common'
-import { formatRangeRupiah } from '@/utils'
+import {
+  JobType,
+  JobApplicationsType,
+  ApplicationsType,
+  ValueRoomType,
+  RoomType,
+} from '@/types/common'
+import { formatRangeRupiah, indonesiaRupiah } from '@/utils'
 import { ValueJobType } from '@/types/common'
 import { Badge } from '@/components/ui/badge'
 import { jobStatusArray } from '..'
@@ -129,6 +135,96 @@ export const columnsJobs = (
                       max_salary_offered: String(
                         row.original.max_salary_offered,
                       ),
+                    },
+                    type: 'delete',
+                  })
+                }
+              }}
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+  },
+]
+
+export const columnsRooms = (
+  onClickAction: ({ data, type }: ValueRoomType) => void,
+): ColumnDef<RoomType>[] => [
+  {
+    accessorKey: 'code',
+    header: 'Code',
+    cell: ({ row }) => <p>{row.getValue('code')}</p>,
+  },
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    cell: ({ row }) => <p>{row.getValue('name')}</p>,
+  },
+  {
+    accessorKey: 'total_room',
+    header: 'Total Room',
+    cell: ({ row }) => <p>{row.original.total_room}</p>,
+  },
+  {
+    accessorKey: 'price',
+    header: 'Price',
+    cell: ({ row }) => <p>{indonesiaRupiah(row.original.price, false)}</p>,
+  },
+  {
+    accessorKey: 'discount',
+    header: 'Discount (%)',
+    cell: ({ row }) => <p>{row.original.discount}</p>,
+  },
+  {
+    accessorKey: 'description',
+    header: 'Description',
+    size: 200,
+    cell: ({ row }) => {
+      const desc = row.getValue('description') as string
+      const shortDesc = desc.length > 15 ? `${desc.slice(0, 15)}...` : desc
+
+      return <p className="whitespace-normal break-words">{shortDesc}</p>
+    },
+  },
+  {
+    id: 'actions',
+    header: 'Actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={() =>
+                onClickAction({
+                  data: {
+                    ...row.original,
+                  },
+                  type: 'edit',
+                })
+              }
+            >
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => {
+                const confirm = window.confirm(
+                  'Are you sure want delete this data ?',
+                )
+                if (confirm) {
+                  onClickAction({
+                    data: {
+                      ...row.original,
                     },
                     type: 'delete',
                   })

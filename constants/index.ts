@@ -1,3 +1,5 @@
+import { addDays, format } from 'date-fns'
+
 export const noteByStatus = {
   in_progress: 'Application is being processed.',
   not_selected: 'Candidate was not selected.',
@@ -27,6 +29,32 @@ export const defaultValueJob = {
   max_salary_offered: '0',
   is_open: true,
 } as const
+
+export const defaultValueRoom = {
+  code: '',
+  name: '',
+  description: '',
+  price: '',
+  discount: '',
+  total_room: '',
+  images: [],
+  videos: [],
+}
+
+export const defaultValueReservation = {
+  code: '',
+  room_id: '',
+  user_id: '',
+  date_range: {
+    from: format(new Date(), 'yyyy-MM-dd'), // hari ini
+    to: format(addDays(new Date(), 1), 'yyyy-MM-dd'), // besok
+  },
+  price: '',
+  discount: '',
+  total_room: '',
+  total_price: '',
+  status: '1',
+}
 
 export const defaultValueProfile = {
   full_name: '',

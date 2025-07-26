@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { drawerArray, jobStatusArray } from '@/constants'
 import { z } from 'zod'
-import { formJobSchema } from './form-schema'
+import { formJobSchema, formRoomSchema } from './form-schema'
 
 export type JobStatusType = (typeof jobStatusArray)[number]
 
@@ -9,6 +9,11 @@ export type DrawerType = (typeof drawerArray)[number]
 
 export type ValueJobType = {
   data?: z.infer<typeof formJobSchema> | any
+  type: DrawerType | string
+}
+
+export type ValueRoomType = {
+  data?: z.infer<typeof formRoomSchema> | any
   type: DrawerType | string
 }
 
@@ -29,6 +34,39 @@ export type JobType = {
   created_at: string
   updated_at: string
   deleted_at: string
+}
+
+export type RoomImageType = {
+  id: string
+  room_id: string
+  image_url: string
+  created_at: string
+  updated_at: string
+}
+
+export type RoomVideoType = {
+  id: string
+  room_id: string
+  video_url: string
+  title: string
+  description: string
+  created_at: string
+  updated_at: string
+}
+
+export type RoomType = {
+  id: string
+  name: string
+  description: string
+  price: number
+  discount: number
+  total_room: number
+  created_at?: string
+  updated_at?: string
+  deleted_at?: string | null
+  images?: []
+  videos?: RoomVideoType[]
+  reviews?: any[]
 }
 
 export type ApplicantType = {
@@ -72,7 +110,9 @@ export type BaseUserType = {
   id: string
   email: string
   password: string
-  role: 'admin' | 'applicant'
+  role: 'admin' | 'customer'
+  full_name: string
+  image_url: string
   created_at: Date | null
   updated_at: Date | null
 }

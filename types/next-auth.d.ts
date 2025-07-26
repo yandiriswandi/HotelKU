@@ -5,8 +5,9 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string
-      applicant_id?: string
       email: string
+      full_name: string
+      image_url: string
       role: string
       token: string
     }
@@ -14,8 +15,9 @@ declare module 'next-auth' {
 
   interface User {
     id: string
-    applicant_id?: string
     email: string
+    full_name: string
+    image_url: string
     role: string
     token: string
   }
@@ -24,8 +26,9 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     id: string
-    applicant_id?: string
     email: string
+    full_name: string
+    image_url: string
     role: string
     token: string
     expires: number

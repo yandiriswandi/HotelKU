@@ -50,7 +50,7 @@
    Status awal saat reservasi dibuat, tetapi belum dilakukan pembayaran.
    Biasanya ada batas waktu tertentu agar pembayaran dilakukan sebelum dianggap kadaluarsa.
 
-2. confirmed
+2. paid
    Reservasi sudah dibayar dan dikonfirmasi oleh sistem.
    Tamu sudah mendapatkan jaminan bahwa kamar tersedia pada tanggal yang dipesan.
 

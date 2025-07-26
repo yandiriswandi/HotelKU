@@ -13,6 +13,11 @@ const menuItems = [
     url: '/dashboard',
     icon: Gauge,
   },
+  {
+    title: 'Rooms',
+    url: '/rooms',
+    icon: Gauge,
+  },
 ]
 
 export default function AdminLayout({

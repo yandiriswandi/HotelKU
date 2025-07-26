@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ChevronDown, Gauge, LogIn, LogOut } from 'lucide-react'
+import { Gauge, LogIn, LogOut, UserRound } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -31,16 +31,20 @@ const LeafIcon = ({ className = 'w-6 h-6', fill = 'currentColor' }) => {
   )
 }
 
-export default function NavbarMenu() {
+export default function NavbarMenu({ showNavbar }: { showNavbar?: boolean }) {
   const { data, status } = useSession()
   const dashboardUrl = data?.user.role === 'admin' ? '/dashboard' : '/applicant'
   const [showProfileForm, setShowProfileForm] = useState(false)
 
   return (
-    <header className="bg-white text-white sticky top-0">
+    <header
+      className={`${
+        showNavbar && 'bg-white shadow-lg'
+      } text-white fixed top-0 right-0 left-0`}
+    >
       <div className="container mx-auto flex justify-between items-center p-4">
         <Link
-          href="#"
+          href="/"
           target="_top"
           className="flex items-center font-semibold text-primary p-2 rounded-xl text-2xl gap-2"
         >
@@ -58,9 +62,10 @@ export default function NavbarMenu() {
         {status === 'authenticated' && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary">
-                My Profile <ChevronDown />
-              </Button>
+              <button className=" rounded-full p-2 bg-white border border-primary">
+                <UserRound size={25} className="text-gray-700" />
+              </button>
+              {/* <Button variant="secondary" className="rounded-full p-2"></Button> */}
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="start">
               <DropdownMenuLabel className="text-gray-400">
