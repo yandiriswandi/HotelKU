@@ -39,7 +39,7 @@ export function errorResponse({
 
 // utils/reservationStatus.ts
 
-type ReservationStatus =
+export type ReservationStatus =
   | '1' // unpaid
   | '2' // paid
   | '3' // checked_in
@@ -49,6 +49,18 @@ type ReservationStatus =
   | '7' // refunded
   | '8' // no_show
   | '9'
+
+export const reservationStatusArray = [
+  '1', // unpaid
+  '2', // paid
+  '3', // checked_in
+  '4', // checked_out
+  '5', // cancelled
+  '6', // expired
+  '7', // refunded
+  '8', // no_show
+  '9',
+] as const
 
 export function getReservationStatusInfo(status: ReservationStatus) {
   const statusMap: Record<

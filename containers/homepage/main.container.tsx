@@ -33,7 +33,7 @@ export default function HomepageMainContainer() {
             transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: false, amount: 0.5 }}
           >
-            <Link href="#jobs" target="_self">
+            <Link href="#rooms" target="_self">
               <Button size="lg" className="font-semibold">
                 Explore Room <Search />
               </Button>

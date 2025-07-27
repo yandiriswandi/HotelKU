@@ -17,6 +17,7 @@ import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useState } from 'react'
 import UpdateApplicantProfile from '../ProfileDrawer'
+import Image from 'next/image'
 
 const LeafIcon = ({ className = 'w-6 h-6', fill = 'currentColor' }) => {
   return (
@@ -51,59 +52,93 @@ export default function NavbarMenu({ showNavbar }: { showNavbar?: boolean }) {
           <LeafIcon className="w-8 h-8" />
           HotelKU
         </Link>
-        {status === 'loading' && <Skeleton className="h-4 w-[100px]" />}
-        {status === 'unauthenticated' && (
-          <Link href="/sign-in">
-            <Button variant="secondary">
-              SIGN IN <LogIn />
-            </Button>
+
+        <div className="flex items-center gap-4">
+          <Link
+            href="/#rooms"
+            target="_top"
+            className="flex items-center text-gray-700 p-2 rounded-xl font-semibold text-lg gap-2 hover:text-primary"
+          >
+            Rooms
           </Link>
-        )}
-        {status === 'authenticated' && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className=" rounded-full p-2 bg-white border border-primary">
-                <UserRound size={25} className="text-gray-700" />
-              </button>
-              {/* <Button variant="secondary" className="rounded-full p-2"></Button> */}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="start">
-              <DropdownMenuLabel className="text-gray-400">
-                Account
-              </DropdownMenuLabel>
-              <DropdownMenuGroup>
-                <DropdownMenuItem>{data.user.email}</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowProfileForm(true)}>
-                  <span>Update Profile</span>
-                </DropdownMenuItem>
-                <Link href={dashboardUrl}>
-                  <DropdownMenuItem>
-                    Visit Dashboard
+          <Link
+            href="/#contact"
+            target="_top"
+            className="flex items-center text-gray-700 p-2 rounded-xl font-semibold text-lg gap-2 hover:text-primary"
+          >
+            Contact
+          </Link>
+          <Link
+            href="/reservations"
+            target="_top"
+            className="flex items-center text-gray-700 p-2 rounded-xl font-semibold text-lg gap-2 hover:text-primary"
+          >
+            Reservations
+          </Link>
+          {status === 'loading' && <Skeleton className="h-4 w-[100px]" />}
+          {status === 'unauthenticated' && (
+            <Link href="/sign-in">
+              <Button variant="secondary">
+                SIGN IN <LogIn />
+              </Button>
+            </Link>
+          )}
+          {status === 'authenticated' && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="relative rounded-full bg-white border border-primary h-12 w-12 overflow-hidden p-0">
+                  {data.user.image_url ? (
+                    <Image
+                      src={data.user.image_url}
+                      alt=""
+                      fill
+                      className="object-cover object-center"
+                    />
+                  ) : (
+                    <UserRound size={25} className="text-gray-700 m-auto" />
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="start">
+                <DropdownMenuLabel className="text-gray-400">
+                  Account
+                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>{data.user.email}</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowProfileForm(true)}>
+                    <span>Update Profile</span>
+                  </DropdownMenuItem>
+                  {data.user.role === 'admin' && (
+                    <Link href={dashboardUrl}>
+                      <DropdownMenuItem>
+                        Visit Dashboard
+                        <DropdownMenuShortcut>
+                          <Gauge />
+                        </DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={() =>
+                      signOut({
+                        callbackUrl: process.env.NEXT_PUBLIC_URL_DOMAIN,
+                      })
+                    }
+                  >
+                    Sign out
                     <DropdownMenuShortcut>
-                      <Gauge />
+                      <LogOut />
                     </DropdownMenuShortcut>
                   </DropdownMenuItem>
-                </Link>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  variant="destructive"
-                  onClick={() =>
-                    signOut({
-                      callbackUrl: process.env.NEXT_PUBLIC_URL_DOMAIN,
-                    })
-                  }
-                >
-                  Sign out
-                  <DropdownMenuShortcut>
-                    <LogOut />
-                  </DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
       <UpdateApplicantProfile
         open={showProfileForm}

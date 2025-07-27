@@ -1,21 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { db } from '@/lib/db'
 // import { roomTable, jobApplicationsTable } from '@/lib/db/schema'
-import { errorResponse, jsonResponse } from '@/utils'
-import { formJobSchema, formRoomSchema } from '@/types/form-schema'
-import { sql, eq, and, isNull, desc, isNotNull } from 'drizzle-orm'
-import { alias } from 'drizzle-orm/pg-core'
-import { getToken } from 'next-auth/jwt'
-import { NextRequest } from 'next/server'
 import {
   reservationLogsTable,
   reservationTable,
   roomImageTable,
   roomReviewTable,
   roomTable,
-  roomVideosTable,
   usersTable,
 } from '@/lib/db/schema'
+import { errorResponse, jsonResponse } from '@/utils'
+import { desc, eq, sql } from 'drizzle-orm'
+import { NextRequest } from 'next/server'
 
 export async function GET(
   req: NextRequest,

@@ -29,6 +29,7 @@ import { z } from 'zod'
 import { VideoTableForm } from './form-videos'
 import { toast } from 'sonner'
 import LoadingOverlay from '@/components/LoadingOverlay'
+import { useRouter } from 'next/navigation'
 
 type AdminRoomsFormProps = {
   open: ValueRoomType
@@ -43,6 +44,7 @@ export default function AdminRoomsForm({
   onOpen,
   onFinish,
 }: AdminRoomsFormProps) {
+  const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [isUploading, setIsUploading] = useState(false)
@@ -74,6 +76,7 @@ export default function AdminRoomsForm({
         toast.success(`${open?.type} successful`)
         onFinish()
         handleClose()
+        router.refresh()
       }
     } catch (error) {
       console.log('error => ', error)

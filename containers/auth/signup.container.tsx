@@ -26,18 +26,19 @@ import { z } from 'zod'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useState } from 'react'
+import LoadingOverlay from '@/components/LoadingOverlay'
 
 export default function AuthSignupContainer() {
   const [loading, setLoading] = useState<boolean>(false)
+  const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
   const { form } = useFormAction({
     schema: formSignupSchema,
     defaultValues: {
       full_name: '',
       phone: '',
-      summary: '',
-      min_salary_expectation: '0',
-      max_salary_expectation: '0',
+      address: '',
+      image_url: '',
       email: '',
       password: '',
     },
@@ -70,6 +71,7 @@ export default function AuthSignupContainer() {
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <LoadingOverlay isLoading={isUploading} message="uploading image..." />
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-4">
           <div>
@@ -108,6 +110,47 @@ export default function AuthSignupContainer() {
                   />
                   <FormField
                     control={form.control}
+                    name="image_url"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Upload Images</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={async (e) => {
+                              const files = e?.target?.files?.[0]
+                              if (!files) return
+                              setIsUploading(true)
+                              const uploadedUrls: string[] = []
+
+                              const formData = new FormData()
+                              formData.append('image', files)
+
+                              // 👇 request ke Cloudinary
+                              const res = await fetch(`/api/upload`, {
+                                method: 'POST',
+                                body: formData,
+                              })
+
+                              const data = await res.json()
+                              uploadedUrls.push(data.data.secure_url)
+
+                              setIsUploading(false)
+
+                              // 👇 set ke form field `images`
+
+                              form.setValue('image_url', data.data.secure_url)
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
@@ -127,55 +170,18 @@ export default function AuthSignupContainer() {
                   />
                   <FormField
                     control={form.control}
-                    name="summary"
+                    name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Summary</FormLabel>
+                        <FormLabel>Address</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Summary ..." {...field} />
+                          <Textarea placeholder="Address ..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="min_salary_expectation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Min Salary Expectation</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            placeholder="min_salary_expectation ..."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="max_salary_expectation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Max Salary Expectation</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            placeholder="max_salary_expectation ..."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+
                   <FormField
                     control={form.control}
                     name="email"

@@ -71,8 +71,11 @@ export async function GET(req: NextRequest) {
     req,
     secret: process.env.NEXTAUTH_SECRET,
   })
+
+  console.log(session)
+
   try {
-    const baseQuery = await db
+    const baseQuery = db
       .select({
         id: reservationTable.id,
         code: reservationTable.code,
@@ -87,15 +90,12 @@ export async function GET(req: NextRequest) {
         status: reservationTable.status,
         created_at: reservationTable.created_at,
         updated_at: reservationTable.updated_at,
-
-        // 👤 USER sebagai object
         user: sql`json_build_object(
       'id', ${usersTable.id},
       'full_name', ${usersTable.full_name},
       'phone', ${usersTable.phone},
       'email', ${usersTable.email}
-      )`.as('user'),
-        // 🏨 ROOM sebagai object dengan array image
+    )`.as('user'),
         room: sql`json_build_object(
       'id', ${roomTable.id},
       'code', ${roomTable.code},
@@ -112,12 +112,16 @@ export async function GET(req: NextRequest) {
       .groupBy(reservationTable.id, usersTable.id, roomTable.id)
       .orderBy(desc(reservationTable.created_at))
 
-    // if (session?.role === 'customer') {
-    //   baseQuery.where(eq(reservationTable.user_id, session.id))
-    // }
+    // beri tipe dari baseSelect
+    let query
 
-    const result = await baseQuery
+    query = baseQuery
 
+    if (session?.role === 'customer') {
+      query = query.where(eq(reservationTable.user_id, session.id))
+    }
+
+    const result = await query
     return jsonResponse({ data: result })
   } catch (error) {
     console.log('error=>', error)

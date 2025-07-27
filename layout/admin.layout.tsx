@@ -3,7 +3,7 @@
 import { SessionProvider } from 'next-auth/react'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import MenuDashboard from '@/components/section/menu-dashboard'
-import { Gauge } from 'lucide-react'
+import { Building2, Gauge } from 'lucide-react'
 import React from 'react'
 import MotionContainer from '@/containers/motion.container'
 
@@ -16,7 +16,7 @@ const menuItems = [
   {
     title: 'Rooms',
     url: '/rooms',
-    icon: Gauge,
+    icon: Building2,
   },
 ]
 

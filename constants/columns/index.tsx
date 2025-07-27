@@ -1,83 +1,130 @@
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import {
-  MoreHorizontal,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Paperclip,
-} from 'lucide-react'
-import { ColumnDef } from '@tanstack/react-table'
-import {
-  JobType,
-  JobApplicationsType,
-  ApplicationsType,
-  ValueRoomType,
-  RoomType,
-} from '@/types/common'
-import { formatRangeRupiah, indonesiaRupiah } from '@/utils'
-import { ValueJobType } from '@/types/common'
-import { Badge } from '@/components/ui/badge'
-import { jobStatusArray } from '..'
-import { format } from 'date-fns'
 import { formatLocal } from '@/lib/date'
+import {
+  ApplicationsType,
+  reservationLogsType,
+  ReservationsType,
+  RoomType,
+  ValueJobType,
+  ValueRoomType,
+} from '@/types/common'
+import {
+  formatRangeRupiah,
+  getReservationStatusInfo,
+  indonesiaRupiah,
+  ReservationStatus,
+} from '@/utils'
+import { ColumnDef } from '@tanstack/react-table'
+import { format } from 'date-fns'
+import { Clock, MoreHorizontal, Paperclip } from 'lucide-react'
 
-export const columnsJobs = (
+export const columnsReservations = (
   onClickAction: ({ data, type }: ValueJobType) => void,
-): ColumnDef<JobType>[] => [
+): ColumnDef<ReservationsType>[] => [
   {
-    header: 'Open',
-    size: 50,
-    cell: ({ row }) => (
-      <Badge variant={row.original.is_open ? 'default' : 'outline'}>
-        {row.original.is_open ? <CheckCircle2 /> : <XCircle />}{' '}
-        {row.original.is_open ? 'Yes' : 'No'}
-      </Badge>
-    ),
+    accessorKey: 'code',
+    header: 'Code',
+    cell: ({ row }) => <p>{row.getValue('code')}</p>,
   },
   {
-    accessorKey: 'title',
-    header: 'Title',
-    cell: ({ row }) => <p>{row.getValue('title')}</p>,
+    accessorKey: 'room',
+    header: 'Room Code',
+    size: 100,
+    cell: ({ row }) => <p>{row.original.room.code}</p>,
   },
   {
-    accessorKey: 'description',
-    header: 'Description',
+    accessorKey: 'room',
+    header: 'Room',
+    size: 100,
+    cell: ({ row }) => <p>{row.original.room.name}</p>,
+  },
+  {
+    accessorKey: 'user',
+    header: 'Customer',
+    size: 100,
+    cell: ({ row }) => <p>{row.original.user.full_name}</p>,
+  },
+  {
+    accessorKey: 'user',
+    header: 'Email',
+    size: 100,
+    cell: ({ row }) => <p>{row.original.user.email}</p>,
+  },
+  {
+    accessorKey: 'user',
+    header: 'Phone Number',
+    size: 100,
+    cell: ({ row }) => <p>{row.original.user.phone}</p>,
+  },
+  {
+    accessorKey: 'note',
+    header: 'Note',
     size: 200,
     cell: ({ row }) => (
       <p className="whitespace-normal break-words">
-        {row.getValue('description')}
+        {row.getValue('note') || '-'}
       </p>
     ),
   },
   {
-    header: 'Salary Offered',
+    header: 'Arrival',
     cell: ({ row }) => (
-      <p>{`${formatRangeRupiah(
-        row.original.min_salary_offered,
-        row.original.max_salary_offered,
-      )}`}</p>
+      <p>{`${
+        row?.original?.arrival &&
+        format(new Date(row?.original?.arrival || ''), 'dd MMM yyyy')
+      }`}</p>
     ),
   },
   {
-    accessorKey: 'applicants_total',
-    header: 'Applicants',
-    size: 100,
-    cell: ({ row }) => <p>{row.getValue('applicants_total')}</p>,
+    header: 'Departure',
+    cell: ({ row }) => (
+      <p>{`${
+        row?.original?.departure &&
+        format(new Date(row?.original?.departure || ''), 'dd MMM yyyy')
+      }`}</p>
+    ),
+  },
+  {
+    accessorKey: 'total_room',
+    header: 'Total Room',
+    cell: ({ row }) => <p>{row.getValue('total_room')}</p>,
+  },
+  {
+    accessorKey: 'discount',
+    header: 'Discount (%)',
+    cell: ({ row }) => <p>{row.getValue('discount') || '-'}</p>,
+  },
+  {
+    accessorKey: 'price',
+    header: 'Price',
+    cell: ({ row }) => (
+      <p>{indonesiaRupiah(row.getValue('price'), false) || '-'}</p>
+    ),
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const statusInfo = getReservationStatusInfo(
+        row?.original?.status as ReservationStatus,
+      )
+      return (
+        <Badge
+          className={`text-sm font-semibold ${
+            statusInfo?.textColor ?? 'text-gray-700'
+          } ${statusInfo?.bgColor ?? 'bg-gray-200'}`}
+        >
+          {statusInfo?.label ?? 'Unknown'}
+        </Badge>
+      )
+    },
   },
   {
     id: 'actions',
@@ -103,45 +150,20 @@ export const columnsJobs = (
                 })
               }
             >
-              View Applicants
+              View Reservation Logs
             </DropdownMenuItem>
+
             <DropdownMenuItem
-              onClick={() =>
+              onClick={() => {
                 onClickAction({
                   data: {
                     ...row.original,
-                    min_salary_offered: String(row.original.min_salary_offered),
-                    max_salary_offered: String(row.original.max_salary_offered),
                   },
-                  type: 'edit',
+                  type: 'update',
                 })
-              }
-            >
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => {
-                const confirm = window.confirm(
-                  'Are you sure want delete this data ?',
-                )
-                if (confirm) {
-                  onClickAction({
-                    data: {
-                      ...row.original,
-                      min_salary_offered: String(
-                        row.original.min_salary_offered,
-                      ),
-                      max_salary_offered: String(
-                        row.original.max_salary_offered,
-                      ),
-                    },
-                    type: 'delete',
-                  })
-                }
               }}
             >
-              Delete
+              Update Status
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -240,75 +262,79 @@ export const columnsRooms = (
   },
 ]
 
-export const columnsJobApplications = (
-  onClickAction: ({ id, status }: { id: string; status: string }) => void,
-): ColumnDef<JobApplicationsType>[] => [
-  {
-    header: 'Full Name',
-    cell: ({ row }) => <p>{row.original.applicant.full_name}</p>,
-  },
-  {
-    header: 'Phone',
-    cell: ({ row }) => <p>{row.original.applicant.phone}</p>,
-  },
-  {
-    header: 'Summary',
-    size: 200,
-    cell: ({ row }) => (
-      <p className="whitespace-normal break-words">
-        {row.original.applicant.summary}
-      </p>
-    ),
-  },
-  {
-    header: 'Salary Expectation',
-    cell: ({ row }) => (
-      <p>{`${formatRangeRupiah(
-        row.original.applicant.min_salary_expectation,
-        row.original.applicant.max_salary_expectation,
-      )}`}</p>
-    ),
-  },
-  {
-    header: 'Status',
-    cell: ({ row }) => (
-      <Badge variant="secondary" className="capitalize">
-        {String(row.original.status).replaceAll('_', ' ')}
-      </Badge>
-    ),
-  },
-  {
-    id: 'actions',
-    header: 'Actions',
-    enableHiding: false,
-    cell: ({ row }) => (
-      <Select
-        value={row.original.status}
-        onValueChange={(value) =>
-          onClickAction({ id: row.original.id, status: value })
-        }
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select a status" />
-        </SelectTrigger>
-        <SelectContent className="capitalize">
-          <SelectGroup>
-            <SelectLabel>Status</SelectLabel>
-            {jobStatusArray.map((status) => (
-              <SelectItem
-                key={status}
-                value={status}
-                disabled={status === row.original.status}
-              >
-                {String(status).replaceAll('_', ' ')}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    ),
-  },
-]
+export const columnsReservationLogs =
+  (): // onClickAction: ({ id, status }: { id: string; status: string }) => void,
+  ColumnDef<reservationLogsType>[] => [
+    {
+      header: 'Status',
+      cell: ({ row }) => {
+        const statusInfo = getReservationStatusInfo(
+          row?.original?.status as ReservationStatus,
+        )
+        return (
+          <Badge
+            className={`text-sm font-semibold ${
+              statusInfo?.textColor ?? 'text-gray-700'
+            } ${statusInfo?.bgColor ?? 'bg-gray-200'}`}
+          >
+            {statusInfo?.label ?? 'Unknown'}
+          </Badge>
+        )
+      },
+    },
+    {
+      accessorKey: 'note',
+      header: 'Note',
+      cell: ({ row }) => <p>{row.getValue('note')}</p>,
+    },
+    {
+      header: 'Created At',
+      cell: ({ row }) => (
+        <p>{`${
+          row?.original?.created_at &&
+          format(new Date(row?.original?.created_at || ''), 'dd MMM yyyy HH:mm')
+        }`}</p>
+      ),
+    },
+    // {
+    //   id: 'actions',
+    //   header: 'Actions',
+    //   enableHiding: false,
+    //   cell: ({ row }) => {
+    //     return (
+    //       <Select
+    //         value={row.original.status}
+    //         onValueChange={(value) =>
+    //           onClickAction({ id: row.original.id, status: value })
+    //         }
+    //       >
+    //         <SelectTrigger className="w-[180px]">
+    //           <SelectValue placeholder="Select a status" />
+    //         </SelectTrigger>
+    //         <SelectContent className="capitalize">
+    //           <SelectGroup>
+    //             <SelectLabel>Status</SelectLabel>
+    //             {reservationStatusArray?.map((status) => {
+    //               const statusInfo = getReservationStatusInfo(
+    //                 status as ReservationStatus,
+    //               )
+    //               return (
+    //                 <SelectItem
+    //                   key={status}
+    //                   value={status}
+    //                   disabled={status === row.original.status}
+    //                 >
+    //                   {statusInfo?.label}
+    //                 </SelectItem>
+    //               )
+    //             })}
+    //           </SelectGroup>
+    //         </SelectContent>
+    //       </Select>
+    //     )
+    //   },
+    // },
+  ]
 
 export const columnsApplications: ColumnDef<ApplicationsType>[] = [
   {

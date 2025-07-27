@@ -1,34 +1,41 @@
-import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import {
-  applicantsTable,
-  jobsTable,
-  jobApplicationsTable,
-} from '@/lib/db/schema'
-import { eq, sql } from 'drizzle-orm'
+import { reservationTable, roomTable, usersTable } from '@/lib/db/schema'
+import { eq, inArray, sql } from 'drizzle-orm'
+import { NextResponse } from 'next/server'
 
 export const GET = async () => {
   try {
-    const totalApplicants = await db
+    const totalCustomers = await db
       .select({ count: sql<number>`count(*)` })
-      .from(applicantsTable)
+      .from(usersTable)
+      .where(eq(usersTable.role, 'customer'))
       .then((res) => res[0].count)
 
-    const totalJobs = await db
+    const totalRooms = await db
       .select({ count: sql<number>`count(*)` })
-      .from(jobsTable)
-      .where(eq(jobsTable.is_open, true))
+      .from(roomTable)
       .then((res) => res[0].count)
 
-    const totalJobApplications = await db
+    const totalReservations = await db
       .select({ count: sql<number>`count(*)` })
-      .from(jobApplicationsTable)
+      .from(reservationTable)
       .then((res) => res[0].count)
+
+    const GrandTotal = await db
+      .select({
+        grand_total: sql<number>`SUM(${reservationTable.total_price})`,
+      })
+      .from(reservationTable)
+      .where(
+        inArray(reservationTable?.status, [3, 4, 5]), // ← status sebagai string
+      )
+      .then((res) => res[0].grand_total)
 
     return NextResponse.json({
-      totalApplicants,
-      totalJobs,
-      totalJobApplications,
+      totalCustomers,
+      totalRooms,
+      totalReservations,
+      GrandTotal,
     })
   } catch (error) {
     console.error('Failed to fetch dashboard reports:', error)

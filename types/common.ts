@@ -22,18 +22,26 @@ export type ApiResponse<T> = {
   data: T
 }
 
-export type JobType = {
+export interface ReservationsType {
   id: string
-  title: string
-  description: string
-  min_salary_offered: number
-  max_salary_offered: number
-  is_open: boolean
-  is_applied: boolean
-  applicants_total: string
-  created_at: string
-  updated_at: string
-  deleted_at: string
+  code: string
+  room: {
+    code: string
+    name: string
+  }
+  user: {
+    full_name: string
+    email: string
+    phone: string
+  }
+  note?: string
+  arrival?: string | Date
+  departure?: string | Date
+  total_room: number
+  discount?: number
+  price: number
+  total_price: number
+  status: string
 }
 
 export type RoomImageType = {
@@ -78,12 +86,12 @@ export type ApplicantType = {
   summary: string
 }
 
-export type JobApplicationsType = {
+export type reservationLogsType = {
   id: string
   status: string
   created_at: string
   updated_at: string
-  applicant: ApplicantType
+  mote: string
 }
 
 export type ApplicationsType = {

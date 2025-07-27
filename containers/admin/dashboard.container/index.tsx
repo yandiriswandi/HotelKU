@@ -2,14 +2,17 @@
 
 import CardReports from '@/components/section/card-reports'
 import { Separator } from '@/components/ui/separator'
-import AdminDashboardJobTable from './job-table'
 import { useEffect, useState } from 'react'
+import AdminDashboardReservationsTable from './reservations-table'
+import { indonesiaRupiah } from '@/utils'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function AdminDashboardContainer() {
   const [report, setReport] = useState<{
-    totalApplicants: number
-    totalJobs: number
-    totalJobApplications: number
+    totalCustomers: number
+    totalRooms: number
+    totalReservations: number
+    GrandTotal: number
   } | null>(null)
 
   const [loading, setLoading] = useState(true)
@@ -32,19 +35,24 @@ export default function AdminDashboardContainer() {
 
   const cardItems = [
     {
-      title: 'Applicants',
-      value: report?.totalApplicants ?? 0,
-      description: 'Total Applicants',
+      title: 'Customers',
+      value: Number(report?.totalCustomers) ?? 0,
+      description: 'Total Customers',
     },
     {
-      title: 'Jobs',
-      value: report?.totalJobs ?? 0,
-      description: 'Jobs Opening',
+      title: 'Rooms',
+      value: Number(report?.totalRooms) ?? 0,
+      description: 'Total Rooms',
     },
     {
-      title: 'Applications',
-      value: report?.totalJobApplications ?? 0,
-      description: 'Job Applications',
+      title: 'Reservations',
+      value: Number(report?.totalReservations) ?? 0,
+      description: 'Total Reservations',
+    },
+    {
+      title: 'Grand Total',
+      value: indonesiaRupiah(Number(report?.GrandTotal), false) ?? 0,
+      description: 'Final Reservation Amount',
     },
   ]
 
@@ -52,14 +60,23 @@ export default function AdminDashboardContainer() {
     <div className="@container/main flex flex-1 flex-col gap-2">
       <div className="flex flex-col gap-4">
         {loading ? (
-          <div className="p-4 text-sm text-muted-foreground">
-            Loading Reports...
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex flex-col gap-2 p-4 border rounded-lg shadow-sm"
+              >
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-1/3" />
+              </div>
+            ))}
           </div>
         ) : (
           <CardReports items={cardItems} />
         )}
         <Separator />
-        <AdminDashboardJobTable />
+        <AdminDashboardReservationsTable />
       </div>
     </div>
   )

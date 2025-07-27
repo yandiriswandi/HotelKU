@@ -50,7 +50,7 @@ const StarRatingLucide: React.FC<RatingProps> = ({ value, max = 5 }) => {
   return <div className="flex gap-1">{stars}</div>
 }
 
-export default function HomepageJobContainer() {
+export default function HomepageRoomContainer() {
   const { data: rooms, isLoading } = useFetcher<ApiResponse<RoomType[]>>({
     path: '/rooms',
   })

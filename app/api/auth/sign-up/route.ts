@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { hashPassword } from '@/helpers'
 import { db } from '@/lib/db'
-import { usersTable, applicantsTable } from '@/lib/db/schema'
+import { usersTable } from '@/lib/db/schema'
 import { formSignupSchema } from '@/types/form-schema'
 import { errorResponse, jsonResponse } from '@/utils'
-import { hashPassword } from '@/helpers'
 import { eq } from 'drizzle-orm'
 
 export async function POST(req: Request) {
@@ -36,8 +36,15 @@ export async function POST(req: Request) {
       const [newUser] = await tx
         .insert(usersTable)
         .values({
+          full_name: parse.data.full_name,
           email: parse.data.email,
           password: await hashPassword(parse.data.password),
+          image_url: parse.data.image_url,
+          phone: parse.data.phone,
+          role: 'customer',
+          address: parse.data.address,
+          created_at: new Date(),
+          updated_at: new Date(),
         })
         .returning()
       if (!newUser?.id) {
@@ -45,19 +52,8 @@ export async function POST(req: Request) {
       }
 
       // create new participant
-      const [newApplicant] = await tx
-        .insert(applicantsTable)
-        .values({
-          user_id: newUser.id,
-          full_name: parse.data.full_name,
-          phone: parse.data.phone,
-          summary: parse.data.summary,
-          min_salary_expectation: Number(parse.data.min_salary_expectation),
-          max_salary_expectation: Number(parse.data.max_salary_expectation),
-        })
-        .returning()
 
-      return { user: newUser, applicant: newApplicant }
+      return { user: newUser }
     })
 
     return jsonResponse({ data: result })

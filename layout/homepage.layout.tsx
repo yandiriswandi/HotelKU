@@ -16,7 +16,7 @@ export default function HomepageLayout({
     const handleScroll = () => {
       const scrollY = window.scrollY
       // Show navbar jika scrollY lebih dari tinggi layar pertama (misal 100vh)
-      setShowNavbar(scrollY > window.innerHeight * 0.8)
+      setShowNavbar(scrollY > window.innerHeight * 0.2)
     }
 
     window.addEventListener('scroll', handleScroll)
