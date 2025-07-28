@@ -153,9 +153,9 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const roomId = params.id
+  const roomId = (await params).id
 
   try {
     // Hapus data image & video yang berelasi

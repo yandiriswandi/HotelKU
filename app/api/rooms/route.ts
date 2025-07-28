@@ -89,10 +89,10 @@ export async function POST(req: Request) {
       .values({
         name: parse.data.name,
         code,
-        price: parseFloat(parse.data.price) || '0',
-        discount: parse.data.discount ? parseFloat(parse.data.discount) : '0',
+        price: parse.data.price || '0', // ⬅️ pastikan hasilnya number
+        discount: parse.data.discount ? parse.data.discount : '', // ⬅️ gunakan `undefined` untuk kolom nullable
         description: parse.data.description || null,
-        total_room: Number(parse.data.total_room) ?? 1,
+        total_room: parse.data.total_room ? parseInt(parse.data.total_room) : 1, // ⬅️ gunakan 1 sebagai default
         created_at: new Date(),
         updated_at: new Date(),
       })
