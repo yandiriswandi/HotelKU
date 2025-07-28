@@ -140,7 +140,7 @@ export default function FormDetailRooms() {
     }
   }
 
-  console.log(rooms)
+  console.log(session)
 
   return (
     <div className="mt-[5rem] p-4">
@@ -263,7 +263,14 @@ export default function FormDetailRooms() {
                   <Button
                     size="lg"
                     type="button"
-                    onClick={() => onSubmitClick()}
+                    onClick={() => {
+                      if (session.status === 'unauthenticated') {
+                        toast.info('You need to sign in to continue process')
+                        router.push('/sign-in')
+                      } else {
+                        onSubmitClick()
+                      }
+                    }}
                     disabled={loading}
                   >
                     {loading && <Loader2Icon className="animate-spin" />}

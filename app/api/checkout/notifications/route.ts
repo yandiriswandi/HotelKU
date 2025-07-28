@@ -52,13 +52,24 @@ export async function POST(req: NextRequest) {
         .where(eq(reservationTable.code, firstPart))
 
       // Kurangi jumlah room yang tersedia
+      // 1. Ambil data room dulu
+      const room = await db
+        .select()
+        .from(roomTable)
+        .where(eq(roomTable.id, reservation.room_id))
+        .then((res) => res[0])
+
+      if (!room) {
+        throw new Error('Room tidak ditemukan')
+      }
+
+      // 2. Hitung total_room baru
+      const newTotalRoom = room.total_room - reservation.total_room
+
+      // 3. Update room
       await db
         .update(roomTable)
-        .set({
-          total_room: reservation.total_room
-            ? Number(roomTable.total_room) - Number(reservation.total_room)
-            : undefined,
-        })
+        .set({ total_room: newTotalRoom })
         .where(eq(roomTable.id, reservation.room_id))
 
       await db

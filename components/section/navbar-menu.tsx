@@ -68,13 +68,15 @@ export default function NavbarMenu({ showNavbar }: { showNavbar?: boolean }) {
           >
             Contact
           </Link>
-          <Link
-            href="/reservations"
-            target="_top"
-            className="flex items-center text-gray-700 p-2 rounded-xl font-semibold text-lg gap-2 hover:text-primary"
-          >
-            Reservations
-          </Link>
+          {status === 'authenticated' && (
+            <Link
+              href="/reservations"
+              target="_top"
+              className="flex items-center text-gray-700 p-2 rounded-xl font-semibold text-lg gap-2 hover:text-primary"
+            >
+              Reservations
+            </Link>
+          )}
           {status === 'loading' && <Skeleton className="h-4 w-[100px]" />}
           {status === 'unauthenticated' && (
             <Link href="/sign-in">
